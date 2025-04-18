@@ -8,29 +8,28 @@ import (
 )
 
 func (h *Handler) SendMoney(c echo.Context) error {
-	senderIdStr := c.FormValue("fromUser")
-	receiverIdStr := c.FormValue("toUser")
+	senderUsername := c.FormValue("fromUser")
+	receiverUsername := c.FormValue("toUser")
 	valueStr := c.FormValue("amount")
 
-	senderId64, err := strconv.ParseUint(senderIdStr, 10, 64)
-	if err != nil {
-		return c.JSON(400, map[string]string{"error": "invalid fromUser"})
+	if senderUsername == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "fromUser (username) is required"})
 	}
-	receiverId64, err := strconv.ParseUint(receiverIdStr, 10, 64)
-	if err != nil {
-		return c.JSON(400, map[string]string{"error": "invalid toUser"})
+	if receiverUsername == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "toUser (username) is required"})
 	}
+	if valueStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "amount is required"})
+	}
+
 	value64, err := strconv.ParseUint(valueStr, 10, 64)
 	if err != nil {
-		return c.JSON(400, map[string]string{"error": "invalid amount"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid amount"})
 	}
-
-	senderId := uint(senderId64)
-	receiverId := uint(receiverId64)
 	value := uint(value64)
 
-	if err := services.SendMoney(h.DB, senderId, receiverId, value); err != nil {
-		return c.JSON(400, map[string]string{"error": err.Error()})
+	if err := services.SendMoney(h.DB, senderUsername, receiverUsername, value); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"status": "success"})

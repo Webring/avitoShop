@@ -7,40 +7,40 @@ import (
 	"gorm.io/gorm"
 )
 
-func SendMoney(db *gorm.DB, fromUserID, toUserID, value uint) error {
-	if value == 0 || fromUserID == toUserID {
-		log.Warnf("Useless send money operation: from %u to %u with value %u", fromUserID, toUserID, value)
+func SendMoney(db *gorm.DB, fromUsername, toUsername string, value uint) error {
+	if value == 0 || fromUsername == toUsername {
+		log.Warnf("Useless send money operation: from %s to %s with value %d", fromUsername, toUsername, value)
 		return nil
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
 		var fromUser, toUser models.User
 
-		if err := tx.First(&fromUser, fromUserID).Error; err != nil {
+		if err := tx.First(&fromUser, "username = ?", fromUsername).Error; err != nil {
 			return errors.New("sender not found")
 		}
 
-		if err := tx.First(&toUser, toUserID).Error; err != nil {
+		if err := tx.First(&toUser, "username = ?", toUsername).Error; err != nil {
 			return errors.New("receiver not found")
 		}
 
 		if fromUser.Money < value {
-			return errors.New("sender haven't enough money")
+			return errors.New("sender doesn't have enough money")
 		}
 
 		if err := tx.Create(&models.MoneyTransaction{
-			FromUserID: fromUserID,
-			ToUserID:   toUserID,
-			Value:      value,
+			FromUsername: fromUsername,
+			ToUsername:   toUsername,
+			Value:        value,
 		}).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Model(&fromUser).Update("Money", fromUser.Money-value).Error; err != nil {
+		if err := tx.Model(&fromUser).Update("money", fromUser.Money-value).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Model(&toUser).Update("Money", toUser.Money+value).Error; err != nil {
+		if err := tx.Model(&toUser).Update("money", toUser.Money+value).Error; err != nil {
 			return err
 		}
 
@@ -48,10 +48,10 @@ func SendMoney(db *gorm.DB, fromUserID, toUserID, value uint) error {
 	})
 }
 
-func SendedMoney(db *gorm.DB, SenderID uint) ([]models.MoneyTransaction, error) {
+func SendedMoney(db *gorm.DB, senderUsername string) ([]models.MoneyTransaction, error) {
 	var moneyTransactions []models.MoneyTransaction
 
-	res := db.Where("from_user_id = ?", SenderID).
+	res := db.Where("from_username = ?", senderUsername).
 		Preload("FromUser").
 		Preload("ToUser").
 		Find(&moneyTransactions)
@@ -59,10 +59,10 @@ func SendedMoney(db *gorm.DB, SenderID uint) ([]models.MoneyTransaction, error) 
 	return moneyTransactions, res.Error
 }
 
-func RecievedMoney(db *gorm.DB, RecieverID uint) ([]models.MoneyTransaction, error) {
+func RecievedMoney(db *gorm.DB, receiverUsername string) ([]models.MoneyTransaction, error) {
 	var moneyTransactions []models.MoneyTransaction
 
-	res := db.Where("to_user_id = ?", RecieverID).
+	res := db.Where("to_username = ?", receiverUsername).
 		Preload("FromUser").
 		Preload("ToUser").
 		Find(&moneyTransactions)
@@ -70,9 +70,8 @@ func RecievedMoney(db *gorm.DB, RecieverID uint) ([]models.MoneyTransaction, err
 	return moneyTransactions, res.Error
 }
 
-func BuyItem(db *gorm.DB, BuyerID uint, ProductName string) error {
-	price, err := ProductPrice(ProductName)
-
+func BuyItem(db *gorm.DB, buyerUsername string, productName string) error {
+	price, err := ProductPrice(productName)
 	if err != nil {
 		return err
 	}
@@ -80,22 +79,22 @@ func BuyItem(db *gorm.DB, BuyerID uint, ProductName string) error {
 	return db.Transaction(func(tx *gorm.DB) error {
 		var buyer models.User
 
-		if err := tx.First(&buyer, BuyerID).Error; err != nil {
+		if err := tx.First(&buyer, "username = ?", buyerUsername).Error; err != nil {
 			return errors.New("buyer not found")
 		}
 
 		if buyer.Money < price {
-			return errors.New("buyer haven't enough money")
+			return errors.New("buyer doesn't have enough money")
 		}
 
 		if err := tx.Create(&models.BoughtItem{
-			BuyerID:  BuyerID,
-			ItemName: ProductName,
+			BuyerUsername: buyerUsername,
+			ItemName:      productName,
 		}).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Model(&buyer).Update("Money", buyer.Money-price).Error; err != nil {
+		if err := tx.Model(&buyer).Update("money", buyer.Money-price).Error; err != nil {
 			return err
 		}
 

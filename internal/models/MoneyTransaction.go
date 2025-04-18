@@ -1,13 +1,16 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+)
 
 type MoneyTransaction struct {
-	gorm.Model
-	FromUserID uint `gorm:"not null;index"`
-	ToUserID   uint `gorm:"not null;index"`
-	Value      uint `gorm:"not null"`
+	CreatedAt time.Time `gorm:"autoCreateTime"` // Только время создания
 
-	FromUser User `gorm:"foreignKey:FromUserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	ToUser   User `gorm:"foreignKey:ToUserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	FromUsername string `gorm:"not null;index"`
+	ToUsername   string `gorm:"not null;index"`
+	Value        uint   `gorm:"not null"`
+
+	FromUser User `gorm:"foreignKey:FromUsername;references:Username;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	ToUser   User `gorm:"foreignKey:ToUsername;references:Username;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 }
