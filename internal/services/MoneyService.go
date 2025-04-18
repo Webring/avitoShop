@@ -51,7 +51,10 @@ func SendMoney(db *gorm.DB, fromUserID, toUserID, value uint) error {
 func SendedMoney(db *gorm.DB, SenderID uint) ([]models.MoneyTransaction, error) {
 	var moneyTransactions []models.MoneyTransaction
 
-	res := db.Where("from_user_id = ?", SenderID).Find(&moneyTransactions)
+	res := db.Where("from_user_id = ?", SenderID).
+		Preload("FromUser").
+		Preload("ToUser").
+		Find(&moneyTransactions)
 
 	return moneyTransactions, res.Error
 }
@@ -59,7 +62,43 @@ func SendedMoney(db *gorm.DB, SenderID uint) ([]models.MoneyTransaction, error) 
 func RecievedMoney(db *gorm.DB, RecieverID uint) ([]models.MoneyTransaction, error) {
 	var moneyTransactions []models.MoneyTransaction
 
-	res := db.Where("to_user_id = ?", RecieverID).Find(&moneyTransactions)
+	res := db.Where("to_user_id = ?", RecieverID).
+		Preload("FromUser").
+		Preload("ToUser").
+		Find(&moneyTransactions)
 
 	return moneyTransactions, res.Error
+}
+
+func BuyItem(db *gorm.DB, BuyerID uint, ProductName string) error {
+	price, err := ProductPrice(ProductName)
+
+	if err != nil {
+		return err
+	}
+
+	return db.Transaction(func(tx *gorm.DB) error {
+		var buyer models.User
+
+		if err := tx.First(&buyer, BuyerID).Error; err != nil {
+			return errors.New("buyer not found")
+		}
+
+		if buyer.Money < price {
+			return errors.New("buyer haven't enough money")
+		}
+
+		if err := tx.Create(&models.BoughtItem{
+			BuyerID:  BuyerID,
+			ItemName: ProductName,
+		}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&buyer).Update("Money", buyer.Money-price).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

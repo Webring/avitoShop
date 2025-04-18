@@ -16,7 +16,7 @@ import (
 )
 
 func DBinit(db *gorm.DB) {
-	err := db.AutoMigrate(&models.User{}, &models.MoneyTransaction{})
+	err := db.AutoMigrate(&models.User{}, &models.MoneyTransaction{}, models.BoughtItem{})
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -51,6 +51,8 @@ func main() {
 	e.Use(middleware.Recover())
 
 	e.POST("/api/sendCoin", h.SendMoney)
+	e.GET("/api/buy/:item", h.BuyItem)
+	e.GET("/api/coinHistory", h.MoneyHistory)
 
 	address := fmt.Sprintf("%s:%s", conf.Host, conf.Port)
 

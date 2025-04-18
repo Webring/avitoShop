@@ -8,6 +8,6 @@ type MoneyTransaction struct {
 	ToUserID   uint `gorm:"not null;index"`
 	Value      uint `gorm:"not null"`
 
-	FromUser User `gorm:"foreignKey:FromUserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // связи с пользователями
+	FromUser User `gorm:"foreignKey:FromUserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	ToUser   User `gorm:"foreignKey:ToUserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
