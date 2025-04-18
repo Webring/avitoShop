@@ -1,0 +1,7 @@
+.idea
+*.exe
+*.exe~
+go.work
+go.work.sum
+
+.env

@@ -1,0 +1,53 @@
+type: collection.insomnia.rest/5.0
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1744979592224
+  modified: 1744979592224
+collection:
+  - url: localhost:8080/api/sendCoin
+    name: SendCoin
+    meta:
+      id: req_3d1a97afde3847dc8ffe9f97c556750f
+      created: 1744979890061
+      modified: 1744980996828
+      isPrivate: false
+      sortKey: -1744979890061
+    method: POST
+    parameters:
+      - id: pair_5864ab419a11476b9c04aeb7fc9de1d2
+        name: fromUser
+        value: "3"
+        disabled: false
+      - id: pair_664a2a68bd044fc5aaceb37c21917bb5
+        name: toUser
+        value: "1"
+        disabled: false
+      - id: pair_598928a6cf044cc1a01237fb3428f0f5
+        name: amount
+        value: "1"
+        disabled: false
+    headers:
+      - name: User-Agent
+        value: insomnia/11.0.2
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1744979599293
+    modified: 1744979599293
+environments:
+  name: Base Environment
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1744979599143
+    modified: 1744979599143
+    isPrivate: false
