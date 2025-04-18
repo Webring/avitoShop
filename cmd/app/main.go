@@ -6,6 +6,7 @@ import (
 	"AvitoShop/internal/transport/rest"
 	"errors"
 	"fmt"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -45,14 +46,24 @@ func main() {
 	DBinit(db)
 
 	e := echo.New()
-	h := &handlers.Handler{DB: db}
+	h := &handlers.Handler{
+		DB:     db,
+		Secret: []byte(conf.SecretKey),
+	}
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.POST("/api/sendCoin", h.SendMoney)
-	e.GET("/api/buy/:item", h.BuyItem)
-	e.GET("/api/coinHistory", h.MoneyHistory)
+	rApi := e.Group("/api")
+
+	rApi.POST("/auth", h.Auth)
+	authRequired := rApi.Group("")
+	authRequired.Use(echojwt.JWT(h.Secret))
+
+	authRequired.GET("/info", h.Information)
+	authRequired.POST("/sendCoin", h.SendMoney)
+	authRequired.GET("/buy/:item", h.BuyItem)
+	authRequired.GET("/coinHistory", h.MoneyHistory)
 
 	address := fmt.Sprintf("%s:%s", conf.Host, conf.Port)
 

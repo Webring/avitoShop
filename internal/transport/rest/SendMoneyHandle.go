@@ -2,19 +2,23 @@ package handlers
 
 import (
 	"AvitoShop/internal/services"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
 )
 
 func (h *Handler) SendMoney(c echo.Context) error {
-	senderUsername := c.FormValue("fromUser")
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	senderUsername, ok := claims["username"].(string)
+	if !ok {
+		return echo.NewHTTPError(http.StatusBadRequest, "Username not found in token")
+	}
+
 	receiverUsername := c.FormValue("toUser")
 	valueStr := c.FormValue("amount")
 
-	if senderUsername == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "fromUser (username) is required"})
-	}
 	if receiverUsername == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "toUser (username) is required"})
 	}

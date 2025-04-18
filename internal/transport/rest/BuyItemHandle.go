@@ -2,12 +2,18 @@ package handlers
 
 import (
 	"AvitoShop/internal/services"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
 func (h *Handler) BuyItem(c echo.Context) error {
-	buyerUsername := c.QueryParam("buyer")
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	buyerUsername, ok := claims["username"].(string)
+	if !ok {
+		return echo.NewHTTPError(http.StatusBadRequest, "Username not found in token")
+	}
 	item := c.Param("item")
 
 	if buyerUsername == "" {

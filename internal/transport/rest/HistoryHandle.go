@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"AvitoShop/internal/services"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -21,7 +22,12 @@ type SentMoneyTransactionDTO struct {
 }
 
 func (h *Handler) MoneyHistory(c echo.Context) error {
-	username := c.QueryParam("user")
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	username, ok := claims["username"].(string)
+	if !ok {
+		return echo.NewHTTPError(http.StatusBadRequest, "Username not found in token")
+	}
 
 	if username == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "username is required"})
