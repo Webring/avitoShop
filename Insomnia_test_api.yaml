@@ -1,0 +1,139 @@
+type: collection.insomnia.rest/5.0
+name: AvitoShop
+meta:
+  id: wrk_98e01665c4524753b48cfb2dad3338f5
+  created: 1745038680219
+  modified: 1745038680219
+collection:
+  - name: AuthRequired
+    meta:
+      id: fld_e2eacead8b504293a8a7942975a49017
+      created: 1745051977541
+      modified: 1745052044074
+      sortKey: -1745051977541
+    children:
+      - url: "{{ _.base_url }}/api/profile"
+        name: Information
+        meta:
+          id: req_e7234627685c44788f8043a4995c2c81
+          created: 1745038863276
+          modified: 1745054407439
+          isPrivate: false
+          sortKey: -1745052007631
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/api/buy/:item"
+        name: Buy
+        meta:
+          id: req_74bb2f1135e74966b051a52f2941be8c
+          created: 1745051389660
+          modified: 1745055566060
+          isPrivate: false
+          sortKey: -1745052007431
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+        pathParameters:
+          - name: item
+            value: cup
+      - url: "{{ _.base_url }}/api/sendCoin"
+        name: sendCoin
+        meta:
+          id: req_d78c07a6a7124ef3a3271c84ec377138
+          created: 1745052148476
+          modified: 1745053499999
+          isPrivate: false
+          sortKey: -1745052148476
+        method: POST
+        parameters:
+          - id: pair_496f509320cd4dc39eb36ba404fce0bd
+            name: toUser
+            value: Gopher
+            disabled: false
+          - id: pair_a540fbcf7ebd4242b67e57ff65372e5b
+            name: amount
+            value: "123"
+            disabled: false
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.2
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+    authentication:
+      type: bearer
+      token: "{{ _.token }}"
+      prefix: Bearer
+  - url: "{{ _.base_url }}/api/auth"
+    name: Auth
+    meta:
+      id: req_08e0918d97384460b9254d693b60d9bd
+      created: 1745038737610
+      modified: 1745052095683
+      isPrivate: false
+      sortKey: -1745051977641
+    method: POST
+    parameters:
+      - id: pair_e13ddf5a811e412881edf60fbf930874
+        name: username
+        value: "user"
+        disabled: false
+      - id: pair_239e8c70231c43c7b2669ded24bb0886
+        name: password
+        value: "password"
+        disabled: false
+    headers:
+      - name: User-Agent
+        value: insomnia/11.0.2
+    scripts:
+      afterResponse: |-
+        const jsonBody = insomnia.response.json();
+        insomnia.environment.set("token", jsonBody.token);
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_c769b94354f8874bca539e8b3a5d0aff6cb19c28
+    created: 1745038680221
+    modified: 1745051129794
+environments:
+  name: Base Environment
+  meta:
+    id: env_c769b94354f8874bca539e8b3a5d0aff6cb19c28
+    created: 1745038680220
+    modified: 1745051926735
+    isPrivate: false
+  data:
+    base_url: localhost:8080
+    token:
