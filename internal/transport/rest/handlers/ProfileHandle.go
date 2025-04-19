@@ -26,9 +26,17 @@ func (h *Handler) Information(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found")
 	}
+	sended, received, err := services.UserMoneyHistory(h.DB, username)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found")
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"coins":     user.Money,
 		"inventory": inventory,
+		"coinHistory": map[string]interface{}{
+			"sent":     sended,
+			"received": received,
+		},
 	})
 }

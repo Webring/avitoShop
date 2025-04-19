@@ -1,13 +1,17 @@
 # Реализация сервиса мерча Avito
 
-## [Текст задания](https://github.com/avito-tech/tech-internship/blob/9459e8244ac43dd5b29f25207a473fc7c84e6ac5/Tech%20Internships/Backend/Backend-trainee-assignment-winter-2025/Backend-trainee-assignment-winter-2025.md)
+## Выполненено [задание](https://github.com/avito-tech/tech-internship/blob/9459e8244ac43dd5b29f25207a473fc7c84e6ac5/Tech%20Internships/Backend/Backend-trainee-assignment-winter-2025/Backend-trainee-assignment-winter-2025.md)
+Едиснтвенное, что ручка `/` перенесена на `/api/profile`
 
-## Использование
 
-Проект написан на golang, gorm, echo.
+В проекте использовались:
+1. Golang
+2. Gorm + postgres driver
+3. Echo
 
 База данных postgresql. Запускается из docker-compose.
 
+## Использование
 ### Все настройки проекта вынесены в .env файл.
 ```
 SECRET_KEY="super-secret-key"
@@ -25,9 +29,8 @@ POSTGRES_PORT=5432
 
 ```bash
 docker compose up -d
-go run cmd/app/main.go
 ```
 
 ## Нужно сделать
 - [ ] Хэшировать пароль с солью
-- [ ] Контейнеризировать приложение
+- [x] Контейнеризировать приложение

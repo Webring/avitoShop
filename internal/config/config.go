@@ -20,7 +20,7 @@ type Config struct {
 func Get() Config {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal(".env file not found")
+		log.Println(".env file not found")
 	}
 	return Config{
 		SecretKey:        os.Getenv("SECRET_KEY"),

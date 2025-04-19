@@ -1,8 +1,8 @@
-version: "3"
+version: "3.8"
 
 services:
   database:
-    container_name: avito_postgres_db
+    container_name: postgres_db
     image: postgres:17-alpine3.19
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -12,6 +12,21 @@ services:
       - "5432:5432"
     volumes:
       - "postgres_data:/var/lib/postgresql/data"
+
+  app:
+    container_name: go_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: database
+    restart: on-failure
 
 
 volumes:

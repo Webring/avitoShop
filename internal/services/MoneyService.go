@@ -101,3 +101,51 @@ func BuyItem(db *gorm.DB, buyerUsername string, productName string) error {
 		return nil
 	})
 }
+
+type MoneyTransactionDTO struct {
+	Amount uint `json:"amount"`
+}
+
+type ReceivedMoneyTransactionDTO struct {
+	MoneyTransactionDTO
+	FromUser string `json:"fromUser"`
+}
+
+type SentMoneyTransactionDTO struct {
+	MoneyTransactionDTO
+	ToUser string `json:"toUser"`
+}
+
+func UserMoneyHistory(db *gorm.DB, username string) ([]SentMoneyTransactionDTO, []ReceivedMoneyTransactionDTO, error) {
+	sended, err := SendedMoney(db, username)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	received, err := RecievedMoney(db, username)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	sentDTOs := make([]SentMoneyTransactionDTO, 0, len(sended))
+	for _, t := range sended {
+		sentDTOs = append(sentDTOs, SentMoneyTransactionDTO{
+			MoneyTransactionDTO: MoneyTransactionDTO{
+				Amount: t.Value,
+			},
+			ToUser: t.ToUser.Username,
+		})
+	}
+
+	receivedDTOs := make([]ReceivedMoneyTransactionDTO, 0, len(received))
+	for _, t := range received {
+		receivedDTOs = append(receivedDTOs, ReceivedMoneyTransactionDTO{
+			MoneyTransactionDTO: MoneyTransactionDTO{
+				Amount: t.Value,
+			},
+			FromUser: t.FromUser.Username,
+		})
+	}
+
+	return sentDTOs, receivedDTOs, nil
+}
